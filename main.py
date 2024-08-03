@@ -7,12 +7,12 @@ import user
 import coloredlogs
 import logging
 
-userIds = os.environ['userIds'].split(',')
-authKeys = os.environ['authKeys'].split(',')
-secretKeys = os.environ['secretKeys'].split(',')
-webhook_discord_url = os.environ['webhookDiscord']
-device_info = os.environ.get('DEVICE_INFO_SECRET')
-user_agent_2 = os.environ.get('USER_AGENT_SECRET_2')
+userIds = os.environ['68218747'].split(',')
+authKeys = os.environ['v1HVnH3vFeV4hUsv:e+8QBAAAAAA='].split(',')
+secretKeys = os.environ['dWepNQmdlfQx+f3x:e+8QBAAAAAA='].split(',')
+webhook_discord_url = os.environ['https://discord.com/api/webhooks/1269161108930035844/RCD-F9CxU8jQV2jRRSDm7LIUnm-OvzN0iX4lY-428z6SeP__JpnaXSzZ0OxaWlc4aHtb']
+device_info = os.environ.get('OnePlus PHK110 / Android OS 13 / API-33 (PHK110_11_A.23/T.119565e-24c-14506e)')
+user_agent_2 = os.environ.get('Dalvik/2.1.0 (Linux; U; Android 13; PHK110 Build/SKQ1.221012.001)')
 fate_region = 'JP'
 
 userNums = len(userIds)
