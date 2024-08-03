@@ -1,4 +1,4 @@
-> [!CAUTION] 
+[![FGO Login System](https://github.com/TanakaLun/F-D-L/actions/workflows/run.yml/badge.svg)](https://github.com/TanakaLun/F-D-L/actions/workflows/run.yml)> [!CAUTION] 
 > 即日起 此项目停止维护
 > 
 > 由于一些软骨头国人向运营报告这个项目，成功的引起了运营的注意，并在 游戏版本 2.95.0 开始 对APK进行CA证书捆绑验证，如果继续使用此项目可能导致BAN！
