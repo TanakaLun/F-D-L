@@ -471,21 +471,31 @@ class user:
             main.logger.info(f"\n ======================================== \n [+] 领取成功 \n ======================================== " )
 
     def lq003(self):
-        # https://game.fate-go.jp/shop/purchase?
-
+        # https://game.fate-go.jp/shop/purchase
+        
         url = 'https://git.atlasacademy.io/atlasacademy/fgo-game-data/raw/branch/JP/master/mstShop.json'
         response = requests.get(url)
 
         fdata = response.json()
         max_base_shop_id = None
         max_base_shop_s_id = None
+        max_base_lim_it_Num = None 
+        max_base_lim_it_s_Num = None 
+        max_base_prices = None
+        max_base_prices_s = None
+        max_base_name_s = '活动'
         num = None
 
         for item in fdata:
             if 4001 in item.get('targetIds', []) and item.get('flag') == 4096:
                 base_shop_id = item.get('baseShopId')
+                base_lim_it_Num = item.get('limitNum')
+                base_prices = item.get('prices')[0]
+                
                 if max_base_shop_id is None or base_shop_id > max_base_shop_id:
                     max_base_shop_id = base_shop_id
+                    max_base_lim_it_Num = base_lim_it_Num
+                    max_base_prices = base_prices
 
         if max_base_shop_id is not None:
             shopId = max_base_shop_id
@@ -502,12 +512,12 @@ class user:
 
             if num_value is not None:
                 shopId = max_base_shop_id
-                num_ok = 5 - num_value
+                num_ok = max_base_lim_it_Num - num_value
                 if num_ok == 0:
                    main.logger.info(f"\n ======================================== \n 每月呼符 你已经兑换过了(´･ω･`) \n ======================================== ")
                 else:
                     mana = gdata['cache']['replaced']['userGame'][0]['mana']
-                    mana_s = mana // 20
+                    mana_s = mana // max_base_prices
                     if mana_s == 0:
                        main.logger.info(f"\n ======================================== \n 魔力棱镜不足(´･ω･`) \n ======================================== ")
                     else:
@@ -526,9 +536,9 @@ class user:
                         if num is not None:
                            main.logger.info(f"\n ======================================== \n 已兑换 {num} 呼符 （每月）\n ======================================== ")       
             else:
-                num_ok = 5
+                num_ok = max_base_lim_it_Num
                 mana = gdata['cache']['replaced']['userGame'][0]['mana']
-                mana_s = mana // 20
+                mana_s = mana // max_base_prices
                 if mana_s == 0:
                    main.logger.info(f"\n ======================================== \n 魔力棱镜不足(´･ω･`) \n ======================================== ")
                 else:
@@ -549,8 +559,17 @@ class user:
         for item in fdata:
             if 4001 in item.get('targetIds', []) and item.get('flag') == 2048:
                 base_shop_s_id = item.get('baseShopId')
+                base_lim_it_s_Num = item.get('limitNum')
+                base_prices_s = item.get('prices')[0]
+                base_name_s = item.get('detail')
+                match = re.search(r'【(.*?)】', base_name_s)
+                base_name_ss = match.group(1)
+                
                 if max_base_shop_s_id is None or base_shop_s_id > max_base_shop_s_id:
                     max_base_shop_s_id = base_shop_s_id
+                    max_base_lim_it_s_Num = base_lim_it_s_Num
+                    max_base_prices_s = base_prices_s
+                    max_base_name_s = base_name_ss
 
         if max_base_shop_s_id is not None:
             shopId = max_base_shop_s_id
@@ -571,7 +590,7 @@ class user:
                                  gdata = json.load(file)
 
                             mana = gdata['cache']['replaced']['userGame'][0]['mana']
-                            mana_s = mana // 20
+                            mana_s = mana // max_base_prices_s
                             num_value = None
 
                             for item in gdata.get('cache', {}).get('updated', {}).get('userShop', []):
@@ -580,9 +599,9 @@ class user:
                                     break
 
                             if num_value is not None:
-                               num_ok = 5 - num_value
+                               num_ok = max_base_lim_it_s_Num - num_value
                                if num_ok == 0:
-                                   main.logger.info(f"\n ======================================== \n 活动呼符 你已经兑换过了(´･ω･`) \n ======================================== ")
+                                   main.logger.info(f"\n ======================================== \n {max_base_name_s}呼符 你已经兑换过了(´･ω･`) \n ======================================== ")
                                    return
                                else:
                                     if mana_s == 0:
@@ -599,11 +618,12 @@ class user:
                                     data = self.Post(
                                         f'{fgourl.server_addr_}/shop/purchase?_userId={self.user_id_}') 
                                     if num is not None:
-                                       main.logger.info(f"\n ======================================== \n 已兑换 {num} 呼符 （限时活动）\n ======================================== ")
+                                       main.logger.info(f"\n ======================================== \n 已兑换 {num} 呼符 // {max_base_name_s} \n ======================================== ")
                             else:
-                                 num_ok = 5
+                                 num_ok = max_base_lim_it_s_Num
                                  mana = gdata['cache']['replaced']['userGame'][0]['mana']
-                                 mana_s = mana // 20
+                                 mana_s = mana // max_base_prices_s
+                                
                                  if mana_s == 0:
                                     main.logger.info(f"\n ======================================== \n 魔力棱镜不足(´･ω･`) \n ======================================== ")
                                     return
@@ -619,7 +639,7 @@ class user:
                                      data = self.Post(
                                          f'{fgourl.server_addr_}/shop/purchase?_userId={self.user_id_}') 
                                      if num is not None:
-                                        main.logger.info(f"\n ======================================== \n 已兑换 {num} 呼符 （限时活动） \n ======================================== ")
+                                        main.logger.info(f"\n ======================================== \n 已兑换 {num} 呼符 // {max_base_name_s} \n ======================================== ")
                     else:
                         main.logger.info(f"时间服务器连接失败")
 
