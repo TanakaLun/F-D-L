@@ -18,10 +18,6 @@ jobs:
     
       - name: Gettings files from Repo
         uses: actions/checkout@v4
-        
-      - name: Install Requeriments
-        run: |
-          pip install -r requirements.txt
 
       - name: Execute main script 1
         run: |
