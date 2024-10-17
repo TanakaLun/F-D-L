@@ -44,7 +44,7 @@ def main():
             try:
                 instance = user.user(userIds[i], authKeys[i], secretKeys[i])
                 time.sleep(3)
-                logger.info(f"\n ======================================== \n [+] 登录账号 \n ======================================== " )
+                logger.info(f"\n {'=' * 40} \n [+] 登录账号 \n {'=' * 40} " )
 
                 time.sleep(1)
                 instance.topLogin_s()
@@ -57,6 +57,8 @@ def main():
                 instance.buyBlueApple()
                 time.sleep(1)
                 instance.lq003()
+                time.sleep(1)
+                instance.LTO_Gacha()
                 time.sleep(1)
                 instance.drawFP()
 

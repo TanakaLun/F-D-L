@@ -221,3 +221,52 @@ def drawFP(servants, missions) -> None:
     }
 
     requests.post(endpoint, json=jsonData, headers=headers)
+
+
+def LTO_Gacha(servants, missions) -> None:
+    endpoint = main.webhook_discord_url
+
+    message_mission = ""
+    message_servant = ""
+    
+    if (len(servants) > 0):
+        servants_atlas = requests.get(
+            f"https://api.atlasacademy.io/export/JP/basic_svt.json").json()
+
+        svt_dict = {svt["id"]: svt for svt in servants_atlas}
+
+        for servant in servants:
+            svt = svt_dict[servant.objectId]
+            message_servant += f"`{svt['name']}` "
+
+    if(len(missions) > 0):
+        for mission in missions:
+            message_mission += f"__{mission.message}__\n{mission.progressTo}/{mission.condition}\n"
+
+    jsonData = {
+        "content": None,
+        "embeds": [
+            {
+                "title": "FGO限定抽卡 - " + main.fate_region,
+                "description": f"完成限定友情抽卡。列出抽卡结果.\n\n{message_mission}",
+                "color": 16711680,
+                "fields": [
+                    {
+                        "name": "限定卡池",
+                        "value": f"{message_servant}",
+                        "inline": False
+                    }
+                ],
+                "thumbnail": {
+                    "url": "https://www.fate-go.jp/manga_fgo/images/commnet_chara02_rv.png"
+                }
+            }
+        ],
+        "attachments": []
+    }
+
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    requests.post(endpoint, json=jsonData, headers=headers)

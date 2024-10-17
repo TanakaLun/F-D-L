@@ -344,7 +344,7 @@ class user:
             if bluebronzesapling > 0:
                 quantity = remaining_ap_int // 40
                 if quantity == 0:
-                    main.logger.info(f"\n ======================================== \n APが40未満の場合は購入できません (´･ω･`)? \n ======================================== ")
+                    main.logger.info(f"\n {'=' * 40} \n APが40未満の場合は購入できません (´･ω･`)? \n {'=' * 40} ")
                     return
                 
                 if bluebronzesapling < quantity:
@@ -371,13 +371,89 @@ class user:
                             purchaseName = resSuccess['purchaseName']
                             purchaseNum = resSuccess['purchaseNum']
 
-                            main.logger.info(f"\n========================================\n[+] {purchaseNum}x {purchaseName} 购买成功\n========================================")
+                            main.logger.info(f"\n{'=' * 40}\n[+] {purchaseNum}x {purchaseName} 购买成功\n{'=' * 40}")
                             webhook.shop(purchaseName, purchaseNum)
             else:
-                main.logger.info(f"\n ======================================== \n ＞︿＜ 青銅の苗木が足りないヽ (*。>Д<)o゜ \n ======================================== " )
+                main.logger.info(f"\n {'=' * 40} \n ＞︿＜ 青銅の苗木が足りないヽ (*。>Д<)o゜ \n {'=' * 40} " )
 
+
+
+
+
+    def LTO_Gacha(self):
+        # 10/16 【期間限定】「岸波白野ピックアップフレンドポイント召喚」！
+
+        nowAt = mytime.GetTimeStamp()
+        closedAt = 1730865599
+
+        #main.logger.info(f"当前时间：{nowAt}")
+        
+        if nowAt > closedAt:
+            main.logger.info(f"期間限定召喚 已结束，当前时间：{nowAt}")
+            return
+
+        with open('login.json', 'r', encoding='utf-8') as file:
+            data = json.load(file)
+
+        user_svt_list = data.get('cache', {}).get('replaced', {}).get('userSvt', [])
+
+        found_svt = False 
+
+        for svt in user_svt_list:
+            svtId = svt.get('svtId')
+            if svtId in [2300800, 2300700]:  #岸波白野的SvtID
+                found_svt = True 
+                
+                gachaId = 3  #这个限定卡池有两个ID【 2 / 3 】懒得写判定，如果报错就用2
+                gachaSubId = 417  #这个限定卡池有两个ID【 416 / 417 】懒得写判定，如果报错就用416
+
+                self.builder_.AddParameter('storyAdjustIds', '[]')
+                self.builder_.AddParameter('selectBonusList', '')
+                self.builder_.AddParameter('gachaId', str(gachaId))
+                self.builder_.AddParameter('num', '10')
+                self.builder_.AddParameter('ticketItemId', '0')
+                self.builder_.AddParameter('shopIdIndex', '1')
+                self.builder_.AddParameter('gachaSubId', str(gachaSubId))
+                
+                main.logger.info(f" \n [+] 期間限定召喚 GachaId：{gachaId} SubId：{gachaSubId}")
+                data = self.Post(f'{fgourl.server_addr_}/gacha/draw?_userId={self.user_id_}')
+                
+                responses = data['response']
+
+                servantArray = []
+                missionArray = []
+
+                for response in responses:
+                    resCode = response['resCode']
+                    resSuccess = response['success']
+
+                    if (resCode != "00"):
+                        continue
+
+                    if "gachaInfos" in resSuccess:
+                        for info in resSuccess['gachaInfos']:
+                            servantArray.append(
+                                gacha.gachaInfoServant(
+                                    info['isNew'], info['objectId'], info['sellMana'], info['sellQp']
+                                )
+                            )
+
+                    if "eventMissionAnnounce" in resSuccess:
+                        for mission in resSuccess["eventMissionAnnounce"]:
+                            missionArray.append(
+                                gacha.EventMission(
+                                    mission['message'], mission['progressFrom'], mission['progressTo'], mission['condition']
+                                )
+                            )
+
+                webhook.LTO_Gacha(servantArray, missionArray)
+
+        if not found_svt:
+            main.logger.info(f" \n 不满足活动条件..不能参加限定召唤")
+            return 
 
     def drawFP(self):
+        #SubID判定有点不准了.偶尔错误抽卡失败...等哪天闲暇再修
         gachaSubId = GetGachaSubIdFP()
 
         if gachaSubId is None:
@@ -391,7 +467,7 @@ class user:
         self.builder_.AddParameter('shopIdIndex', '1')
         self.builder_.AddParameter('gachaSubId', gachaSubId)
 
-        main.logger.info(f"\n ======================================== \n [+] 友情卡池ID : {gachaSubId}\n ======================================== " )
+        main.logger.info(f"\n {'=' * 40} \n [+] 友情卡池ID : {gachaSubId}\n {'=' * 40} " )
         data = self.Post(f'{fgourl.server_addr_}/gacha/draw?_userId={self.user_id_}')
         responses = data['response']
 
@@ -434,7 +510,7 @@ class user:
             f'{fgourl.server_addr_}/present/list?_userId={self.user_id_}')
         
         responses = data['response']
-        main.logger.info(f"\n ======================================== \n [+] 读取礼物盒 \n ======================================== " )
+        main.logger.info(f"\n {'=' * 40} \n [+] 读取礼物盒 \n {'=' * 40} " )
 
     def lq002(self):
          # https://game.fate-go.jp/present/receive?
@@ -468,7 +544,7 @@ class user:
     
             responses = data['response']
 
-            main.logger.info(f"\n ======================================== \n [+] 领取成功 \n ======================================== " )
+            main.logger.info(f"\n {'=' * 40} \n [+] 领取成功 \n {'=' * 40} " )
 
     def lq003(self):
         # https://game.fate-go.jp/shop/purchase
@@ -514,12 +590,12 @@ class user:
                 shopId = max_base_shop_id
                 num_ok = max_base_lim_it_Num - num_value
                 if num_ok == 0:
-                   main.logger.info(f"\n ======================================== \n 每月呼符 你已经兑换过了(´･ω･`) \n ======================================== ")
+                   main.logger.info(f"\n {'=' * 40} \n 每月呼符 你已经兑换过了(´･ω･`) \n {'=' * 40} ")
                 else:
                     mana = gdata['cache']['replaced']['userGame'][0]['mana']
                     mana_s = mana // max_base_prices
                     if mana_s == 0:
-                       main.logger.info(f"\n ======================================== \n 魔力棱镜不足(´･ω･`) \n ======================================== ")
+                       main.logger.info(f"\n {'=' * 40} \n 魔力棱镜不足(´･ω･`) \n {'=' * 40} ")
                     else:
                         if num_ok > mana_s:
                            num = mana_s
@@ -534,13 +610,13 @@ class user:
                 
                         responses = data['response'] 
                         if num is not None:
-                           main.logger.info(f"\n ======================================== \n 已兑换 {num} 呼符 （每月）\n ======================================== ")       
+                           main.logger.info(f"\n {'=' * 40} \n 已兑换 {num} 呼符 （每月）\n {'=' * 40} ")       
             else:
                 num_ok = max_base_lim_it_Num
                 mana = gdata['cache']['replaced']['userGame'][0]['mana']
                 mana_s = mana // max_base_prices
                 if mana_s == 0:
-                   main.logger.info(f"\n ======================================== \n 魔力棱镜不足(´･ω･`) \n ======================================== ")
+                   main.logger.info(f"\n {'=' * 40} \n 魔力棱镜不足(´･ω･`) \n {'=' * 40} ")
                 else:
                     if num_ok > mana_s:
                        num = mana_s
@@ -554,7 +630,7 @@ class user:
                         f'{fgourl.server_addr_}/shop/purchase?_userId={self.user_id_}') 
                     
                     if num is not None:
-                       main.logger.info(f"\n ======================================== \n 已兑换 {num} 呼符 （每月） \n ======================================== ")
+                       main.logger.info(f"\n {'=' * 40} \n 已兑换 {num} 呼符 （每月） \n {'=' * 40} ")
 
         for item in fdata:
             if 4001 in item.get('targetIds', []) and item.get('flag') == 2048:
@@ -583,7 +659,7 @@ class user:
                         current_time = response.json()['unixtime']
 
                         if current_time > closedAt:
-                            main.logger.info(f"\n ======================================== \n 目前没有 绿方块活动(´･ω･`) \n ======================================== ")
+                            main.logger.info(f"\n {'=' * 40} \n 目前没有 绿方块活动(´･ω･`) \n {'=' * 40} ")
                             return
                         else:
                             with open('login.json', 'r', encoding='utf-8') as file:
@@ -601,11 +677,11 @@ class user:
                             if num_value is not None:
                                num_ok = max_base_lim_it_s_Num - num_value
                                if num_ok == 0:
-                                   main.logger.info(f"\n ======================================== \n {max_base_name_s}呼符 你已经兑换过了(´･ω･`) \n ======================================== ")
+                                   main.logger.info(f"\n {'=' * 40} \n {max_base_name_s}呼符 你已经兑换过了(´･ω･`) \n {'=' * 40} ")
                                    return
                                else:
                                     if mana_s == 0:
-                                       main.logger.info(f"\n ======================================== \n 魔力棱镜不足(´･ω･`) \n ======================================== ")
+                                       main.logger.info(f"\n {'=' * 40} \n 魔力棱镜不足(´･ω･`) \n {'=' * 40} ")
                                     else:
                                         if num_ok > mana_s:
                                            num = mana_s
@@ -618,14 +694,14 @@ class user:
                                     data = self.Post(
                                         f'{fgourl.server_addr_}/shop/purchase?_userId={self.user_id_}') 
                                     if num is not None:
-                                       main.logger.info(f"\n ======================================== \n 已兑换 {num} 呼符 // {max_base_name_s} \n ======================================== ")
+                                       main.logger.info(f"\n {'=' * 40} \n 已兑换 {num} 呼符 // {max_base_name_s} \n {'=' * 40} ")
                             else:
                                  num_ok = max_base_lim_it_s_Num
                                  mana = gdata['cache']['replaced']['userGame'][0]['mana']
                                  mana_s = mana // max_base_prices_s
                                 
                                  if mana_s == 0:
-                                    main.logger.info(f"\n ======================================== \n 魔力棱镜不足(´･ω･`) \n ======================================== ")
+                                    main.logger.info(f"\n {'=' * 40} \n 魔力棱镜不足(´･ω･`) \n {'=' * 40} ")
                                     return
                                  else:
                                      if num_ok > mana_s:
@@ -639,7 +715,7 @@ class user:
                                      data = self.Post(
                                          f'{fgourl.server_addr_}/shop/purchase?_userId={self.user_id_}') 
                                      if num is not None:
-                                        main.logger.info(f"\n ======================================== \n 已兑换 {num} 呼符 // {max_base_name_s} \n ======================================== ")
+                                        main.logger.info(f"\n {'=' * 40} \n 已兑换 {num} 呼符 // {max_base_name_s} \n {'=' * 40} ")
                     else:
                         main.logger.info(f"时间服务器连接失败")
 

@@ -72,7 +72,7 @@ adb shell cp /storage/emulated/0/Android/data/com.aniplex.fategrandorder/files/d
 
 # 5. 填写 Github Secrets
 
-将下列 密钥类型 和 对应的值 添加到 `右上角 > settings > Secrets and variables > actions`
+创建 密钥类型，并将之前步骤获得的数值 填写到 对应的 密钥类型 中 `右上角 > settings > Secrets and variables > actions`
 <img width="75%" style="border: 1px solid black" src="https://i.imgur.com/J7jb6TX.png">
 
 需要登录多个账号时使用 英文逗号
@@ -113,7 +113,7 @@ adb shell cp /storage/emulated/0/Android/data/com.aniplex.fategrandorder/files/d
 - -------------------------------------------------------------------------------------- -
 
 # 已完成 
-- [x] 自动每日友情点召唤
+- [x] 自动每日友情点召唤/限定活动召唤
 - [x] 自动种蓝苹果🍎
 - [x] 自动领取礼物盒
 - [x] 自动兑换达芬奇商店 每月&限时活动 呼符
