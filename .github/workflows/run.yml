@@ -21,7 +21,7 @@ jobs:
   
       - name: Install Requeriments
         run: |
-          pip install -r requirements.txt --break-system-packages
+          pip install -r requirements.txt
           
       - name: Execute main script 1
         run: |
