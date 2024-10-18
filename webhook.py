@@ -187,8 +187,12 @@ def drawFP(servants, missions) -> None:
         svt_dict = {svt["id"]: svt for svt in servants_atlas}
 
         for servant in servants:
-            svt = svt_dict[servant.objectId]
-            message_servant += f"`{svt['name']}` "
+            objectId = servant.objectId
+            if objectId in svt_dict:
+                svt = svt_dict[objectId]
+                message_servant += f"`{svt['name']}` "
+            else:
+                continue
 
     if(len(missions) > 0):
         for mission in missions:
@@ -236,8 +240,12 @@ def LTO_Gacha(servants, missions) -> None:
         svt_dict = {svt["id"]: svt for svt in servants_atlas}
 
         for servant in servants:
-            svt = svt_dict[servant.objectId]
-            message_servant += f"`{svt['name']}` "
+            objectId = servant.objectId
+            if objectId in svt_dict:
+                svt = svt_dict[objectId]
+                message_servant += f"`{svt['name']}` "
+            else:
+                continue
 
     if(len(missions) > 0):
         for mission in missions:

@@ -7,8 +7,6 @@ class EventMission:
 
 
 class gachaInfoServant:
-    def __init__(self, isNew, objectId, sellMana, sellQp):
-        self.isNew = isNew
+    def __init__(self, objectId):
         self.objectId = objectId
-        self.sellMana = sellMana
-        self.sellQp = sellQp
+
