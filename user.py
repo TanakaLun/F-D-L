@@ -144,6 +144,7 @@ class user:
     def topLogin(self):
         DataWebhook = []  
         device_info = os.environ.get('DEVICE_INFO_SECRET')
+        appCheck = os.environ.get('APP_CHECK_SECRET')
         
         private_key_pem = """
 -----BEGIN RSA PRIVATE KEY-----
@@ -187,6 +188,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
             'assetbundleFolder', fgourl.asset_bundle_folder_)
         self.builder_.AddParameter('idempotencyKeySignature', idempotencyKeySignature)
         self.builder_.AddParameter('deviceInfo', device_info)
+        self.builder_.AddParameter('appCheckErrorMessage', appCheck)
         self.builder_.AddParameter('isTerminalLogin', '1')
         self.builder_.AddParameter('userState', str(userState))
 
@@ -403,7 +405,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
         closedAt = 1730865599
         
         if nowAt > closedAt:
-            main.logger.info(f"\n {'=' * 40} \n [+] 期間限定召喚 已结束，当前时间：{nowAt} \n {'=' * 40} ")
+            main.logger.info(f"\n {'=' * 40} \n [+] 期間限定召喚 已结束 \n {'=' * 40} ")
             return
 
         with open('login.json', 'r', encoding='utf-8') as file:
@@ -562,7 +564,6 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
         
         url = 'https://git.atlasacademy.io/atlasacademy/fgo-game-data/raw/branch/JP/master/mstShop.json'
         response = requests.get(url)
-
         fdata = response.json()
         max_base_shop_id = None
         max_base_shop_s_id = None
@@ -572,7 +573,6 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
         max_base_prices_s = None
         max_base_name_s = '活动'
         num = None
-
         for item in fdata:
             if 4001 in item.get('targetIds', []) and item.get('flag') == 4096:
                 base_shop_id = item.get('baseShopId')
@@ -583,15 +583,11 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                     max_base_shop_id = base_shop_id
                     max_base_lim_it_Num = base_lim_it_Num
                     max_base_prices = base_prices
-
         if max_base_shop_id is not None:
             shopId = max_base_shop_id
-
             with open('login.json', 'r', encoding='utf-8') as file:
                 gdata = json.load(file)
-
             num_value = None
-
             for item in gdata.get('cache', {}).get('updated', {}).get('userShop', []):
                 if item.get('shopId') == shopId:
                     num_value = item.get('num')
@@ -612,10 +608,8 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                            num = mana_s
                         else:
                            num = num_ok
-
                         self.builder_.AddParameter('id', str(shopId))
                         self.builder_.AddParameter('num', str(num))
-
                         data = self.Post(
                             f'{fgourl.server_addr_}/shop/purchase?_userId={self.user_id_}')
                 
@@ -637,10 +631,8 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                        num = mana_s
                     else:
                        num = num_ok
-
                     self.builder_.AddParameter('id', str(shopId))
                     self.builder_.AddParameter('num', str(num))
-
                     data = self.Post(
                         f'{fgourl.server_addr_}/shop/purchase?_userId={self.user_id_}') 
                     
@@ -651,7 +643,6 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                         object_id_count = num
                         webhook.Present(name, namegift, object_id_count)
                     
-
         for item in fdata:
             if 4001 in item.get('targetIds', []) and item.get('flag') == 2048:
                 base_shop_s_id = item.get('baseShopId')
@@ -666,34 +657,27 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                     max_base_lim_it_s_Num = base_lim_it_s_Num
                     max_base_prices_s = base_prices_s
                     max_base_name_s = base_name_ss
-
         if max_base_shop_s_id is not None:
             shopId = max_base_shop_s_id
-
             for item in fdata:
                 if item.get('baseShopId') == max_base_shop_s_id:
                     closedAt = item.get('closedAt')
-
                     response_time = mytime.GetTimeStamp()
                     if response_time > 1700000000:
                         current_time = response_time
-
                         if current_time > closedAt:
                             main.logger.info(f"\n {'=' * 40} \n 目前没有 绿方块活动(´･ω･`) \n {'=' * 40} ")
                             return
                         else:
                             with open('login.json', 'r', encoding='utf-8') as file:
                                  gdata = json.load(file)
-
                             mana = gdata['cache']['replaced']['userGame'][0]['mana']
                             mana_s = mana // max_base_prices_s
                             num_value = None
-
                             for item in gdata.get('cache', {}).get('updated', {}).get('userShop', []):
                                 if item.get('shopId') == shopId:
                                     num_value = item.get('num')
                                     break
-
                             if num_value is not None:
                                num_ok = max_base_lim_it_s_Num - num_value
                                if num_ok == 0:
@@ -707,10 +691,8 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                                            num = mana_s
                                         else:
                                            num = num_ok
-
                                     self.builder_.AddParameter('id', str(shopId))
                                     self.builder_.AddParameter('num', str(num))
-
                                     data = self.Post(
                                         f'{fgourl.server_addr_}/shop/purchase?_userId={self.user_id_}') 
                                     if num is not None:
@@ -735,7 +717,6 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                  
                                      self.builder_.AddParameter('id', str(shopId))
                                      self.builder_.AddParameter('num', str(num))
-
                                      data = self.Post(
                                          f'{fgourl.server_addr_}/shop/purchase?_userId={self.user_id_}') 
                                      if num is not None:
