@@ -88,7 +88,8 @@ adb shell cp /storage/emulated/0/Android/data/com.aniplex.fategrandorder/files/d
 | GAME_USERIDS | 1234,1235 |
 | USER_AGENT_SECRET_2 | Dalvik/2.1.0 (Linux; U; Android 14; Pixel 5 Build/UP1A.231105.001) 建议不要照抄 |
 | DEVICE_INFO_SECRET | Google Pixel 5 / Android OS 14 / API-34 (UP1A.231105.001/10817346) 建议不要照抄 |
-| DISCORD_WEBHOOK | https://discord.com/api/webhooks/randomNumber/randomString |
+| DISCORD_WEBHOOK | https://discord.com/api/webhooks/randomNumber/randomString / 填写你自己的 Webhooks 链接 |
+| APP_CHECK_SECRET | 未知影响-待定 / 暂不填写  |
 
 
 # 6. 设置执行 定时签到任务/ 定时登录 
