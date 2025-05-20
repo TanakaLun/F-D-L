@@ -60,9 +60,10 @@ def main():
                 time.sleep(1)
                 instance.lq003()
                 time.sleep(1)
-                instance.LTO_Gacha()
-                time.sleep(1)
                 instance.drawFP()
+                time.sleep(1)
+                instance.LTO_Gacha()
+                
 
 
             except Exception as ex:
