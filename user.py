@@ -402,7 +402,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
         # 5/15 【期間限定】「アルトリア･ペンドラゴン〔リリィ〕フレンドポイント召喚」！
 
         nowAt = mytime.GetTimeStamp()
-        closedAt = 1747972799
+        closedAt = 1748404799
         
         if nowAt > closedAt:
             main.logger.info(f"\n {'=' * 40} \n [+] 期間限定召喚 已结束 \n {'=' * 40} ")
@@ -517,8 +517,8 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
         self.builder_.AddParameter('num', '10')
         self.builder_.AddParameter('ticketItemId', '0')
         self.builder_.AddParameter('shopIdIndex', '1')
-        #self.builder_.AddParameter('gachaSubId', gachaSubId)
-        self.builder_.AddParameter('gachaSubId', '449')
+        self.builder_.AddParameter('gachaSubId', gachaSubId)
+        #self.builder_.AddParameter('gachaSubId', '449')
 
         main.logger.info(f"\n {'=' * 40} \n [+] 友情卡池ID : {gachaSubId}\n {'=' * 40} " )
         data = self.Post(f'{fgourl.server_addr_}/gacha/draw?_userId={self.user_id_}')
@@ -552,10 +552,16 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
 
         webhook.drawFP(servantArray, missionArray)
 
+    
     def topHome(self):
         self.Post(f'{fgourl.server_addr_}/home/top?_userId={self.user_id_}')
+        
+        time.sleep(2)
+        self.Post(f'{fgourl.server_addr_}/externalPayment/reflect?_userId={self.user_id_}')
+        time.sleep(1)
+        self.Post(f'{fgourl.server_addr_}/externalPayment/reflect?_userId={self.user_id_}')
 
-
+    
     def lq001(self):
          # https://game.fate-go.jp/present/list?
           
