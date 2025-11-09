@@ -1,11 +1,11 @@
 name: FGO Login System
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "30 03 * * *"
     - cron: "30 13 * * *"
     - cron: "30 17 * * *"
-  workflow_dispatch:
 
 jobs:
   build:
@@ -22,26 +22,26 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-  - name: Gettings files from Repo
-    uses: actions/checkout@v4
+      - name: Gettings files from Repo
+        uses: actions/checkout@v4
     
-  - name: Install Requeriments
-    run: |
-      pip install -r requirements.txt
+      - name: Install Requeriments
+        run: |
+          pip install -r requirements.txt
 
-  - name: Execute main script 1
-    run: |
-      python3 main.py
-    env:
-      userIds: ${{ secrets.GAME_USERIDS }}
-      authKeys: ${{ secrets.GAME_AUTHKEYS }}
-      secretKeys: ${{ secrets.GAME_SECRETKEYS }}
-      webhookDiscord: ${{ secrets.DISCORD_WEBHOOK }}
-      DEVICE_INFO_SECRET: ${{ secrets.DEVICE_INFO_SECRET }}
-      APP_CHECK_SECRET: ${{ secrets.APP_CHECK_SECRET }}
-      USER_AGENT_SECRET_2: ${{ secrets.USER_AGENT_SECRET_2 }}
-      TG_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      TG_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      TG_TOPIC_ID: ${{ secrets.TELEGRAM_TOPIC_ID }}
+      - name: Execute main script 1
+        run: |
+          python3 main.py
+        env:
+          userIds: ${{ secrets.GAME_USERIDS }}
+          authKeys: ${{ secrets.GAME_AUTHKEYS }}
+          secretKeys: ${{ secrets.GAME_SECRETKEYS }}           
+          webhookDiscord: ${{ secrets.DISCORD_WEBHOOK }}
+          DEVICE_INFO_SECRET: ${{ secrets.DEVICE_INFO_SECRET }}
+          APP_CHECK_SECRET: ${{ secrets.APP_CHECK_SECRET }}
+          USER_AGENT_SECRET_2: ${{ secrets.USER_AGENT_SECRET_2 }}
+          TG_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TG_TOPIC_ID: ${{ secrets.TELEGRAM_TOPIC_ID }}
 
 
