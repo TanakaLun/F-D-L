@@ -6,7 +6,8 @@ import fgourl
 import user
 import coloredlogs
 import logging
-import mytime 
+import mytime # Added mytime import for the start message
+import traceback # Added traceback import for detailed error logs
 
 userIds = os.environ['userIds'].split(',')
 authKeys = os.environ['authKeys'].split(',')
@@ -23,9 +24,20 @@ secretKeyNums = len(secretKeys)
 
 logger = logging.getLogger("FGO Daily Login")
 coloredlogs.install(fmt='%(asctime)s %(name)s %(levelname)s %(message)s')
-fgourl.TelegramBotToken = os.environ.get('TG_BOT_TOKEN')
-fgourl.TelegramChatId = os.environ.get('TG_CHAT_ID')
-fgourl.TelegramTopicId = os.environ.get('TG_TOPIC_ID')
+
+# ⬇️ 修正/新增 Telegram 环境变量加载 ⬇️
+fgourl.TelegramBotToken = os.environ.get('TGBotToken')
+fgourl.TelegramAdminId = os.environ.get('TGAdminId')
+fgourl.TelegramTopicId = os.environ.get('TGTopicId')
+
+# 原始文件中的其他 env vars 保持不变
+fgourl.ver_code_ = os.environ['verCode']
+fgourl.github_token_ = os.environ['GithubToken']
+fgourl.github_name_ = os.environ['GithubName']
+UA = os.environ['UserAgent']
+if UA != 'nullvalue':
+    fgourl.user_agent_ = UA
+# ⬆️ 修正/新增 Telegram 环境变量加载 ⬆️
 
 
 def get_latest_verCode():
@@ -53,6 +65,8 @@ def main():
                 instance = user.user(userIds[i], authKeys[i], secretKeys[i])
                 time.sleep(1)
                 logger.info(f"\n {'=' * 40} \n [+] 登录账号 \n {'=' * 40} " )
+                
+                # 登录和操作，这些方法已在 user.py 中更新以发送详细 Telegram 报告
                 instance.topLogin()
                 time.sleep(2)
                 instance.topHome()
@@ -69,11 +83,15 @@ def main():
                 time.sleep(1)
                 instance.drawFP()
                 time.sleep(1)
-                instance.gachaTop()
+                instance.gachaTop() # 现在已在 user.py 中修复
 
             except Exception as e:
                 logger.error(f"处理用户 {userIds[i]} 失败: {e}")
-                fgourl.SendTelegramMessage(f'❌ *账号处理失败*\n用户ID: `{userIds[i]}`\n错误: {e}')
+                # 出现错误时，发送错误消息到 Telegram，包含详细堆栈信息
+                error_trace = traceback.format_exc()
+                fgourl.SendTelegramMessage(
+                    f'❌ *账号处理失败*\n用户ID: `{userIds[i]}`\n错误: `{e}`\n\n*详细追踪*:\n```\n{error_trace}\n```'
+                )
 
         fgourl.SendTelegramMessage(f'✅ *FGO 自动登录结束* (处理 {userNums} 个账号)')
     else:
