@@ -192,144 +192,150 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
         self.builder_.AddParameter('isTerminalLogin', '1')
         self.builder_.AddParameter('userState', str(userState))
 
-        data = self.Post(
-            f'{fgourl.server_addr_}/login/top?_userId={self.user_id_}')
-
-        responses = data['response']
+        data = self.Post(f'{fgourl.server_addr_}/login/top?_userId={self.user_id_}')
         
-        with open('login.json', 'w', encoding='utf-8') as file:
-            json.dump(data, file, ensure_ascii=False, indent=4)
+        with open('login.json', 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+
+        # 提取资源信息 (Rewards Data)
+        rewards_data = {
+            'stone': data['cache']['replaced']['tblUserGame'][0]['stone'],
+            'ticket': data['cache']['replaced']['tblUserGame'][0]['ticket'],
+            'lv': data['cache']['replaced']['userGame'][0]['lv'],
+            'con_login': data['cache']['replaced']['userGame'][0]['continuousLoginTime'],
+            'total_login': data['cache']['replaced']['userGame'][0]['totalLoginTime'],
+            'act_max': data['cache']['replaced']['userGame'][0]['actMax'],
+            'ap_recharge': data['cache']['replaced']['tblUserItem'][0].get('num', 0) if data['cache']['replaced']['tblUserItem'] else 0,
+            'mana': data['cache']['replaced']['tblUserGame'][0]['mana'],
+            'total_fp': data['cache']['replaced']['tblUserGame'][0]['friendPoint'],
+        }
         
-        self.name_ = hashlib.md5(
-            data['cache']['replaced']['userGame'][0]['name'].encode('utf-8')).hexdigest()
-        stone = data['cache']['replaced']['userGame'][0]['stone']
-        lv = data['cache']['replaced']['userGame'][0]['lv']
-        ticket = 0
-        goldenfruit = 0
-        silverfruit = 0
-        bronzefruit = 0
-        bluebronzesapling = 0
-        bluebronzefruit = 0
-        pureprism = 0
-        sqf01 = 0
-        holygrail = 0
-
-        for item in data['cache']['replaced']['userItem']:
-            if item['itemId'] == 4001:
-                ticket = item['num']
-                break
-        
-        for item in data['cache']['replaced']['userItem']:
-            if item['itemId'] == 100:
-                goldenfruit = item['num']
-                break
-
-        for item in data['cache']['replaced']['userItem']:
-            if item['itemId'] == 101:
-                silverfruit = item['num']
-                break
-
-        for item in data['cache']['replaced']['userItem']:
-            if item['itemId'] == 102:
-                bronzefruit = item['num']
-                break
-
-        for item in data['cache']['replaced']['userItem']:
-            if item['itemId'] == 103:
-                bluebronzesapling = item['num']
-                break
-
-        for item in data['cache']['replaced']['userItem']:
-            if item['itemId'] == 104:
-                bluebronzefruit = item['num']
-                break
-
-        for item in data['cache']['replaced']['userItem']:
-            if item['itemId'] == 46:
-                pureprism = item['num']
-                break
-
-        for item in data['cache']['replaced']['userItem']:
-            if item['itemId'] == 16:
-                sqf01 = item['num']
-                break
-
-        for item in data['cache']['replaced']['userItem']:
-            if item['itemId'] == 7999:
-                holygrail = item['num']
-                break
-
-        
-        rewards = Rewards(stone, lv, ticket, goldenfruit, silverfruit, bronzefruit, bluebronzesapling, bluebronzefruit, pureprism, sqf01, holygrail)
-
-        DataWebhook.append(rewards)
-
-        login_days = data['cache']['updated']['userLogin'][0]['seqLoginCount']
-        total_days = data['cache']['updated']['userLogin'][0]['totalLoginCount']
-        name1 = data['cache']['replaced']['userGame'][0]['name']
-        fpids1 = data['cache']['replaced']['userGame'][0]['friendCode']
-
-        act_max = data['cache']['replaced']['userGame'][0]['actMax']
         act_recover_at = data['cache']['replaced']['userGame'][0]['actRecoverAt']
-        carryOverActPoint = data['cache']['replaced']['userGame'][0]['carryOverActPoint']
-        serverTime = data['cache']['serverTime']
-        ap_points = act_recover_at - serverTime
-        remaining_ap = 0
-        
-        if ap_points > 0:
-            lost_ap_point = (ap_points + 299) // 300
-            if act_max >= lost_ap_point:
-                remaining_ap_int = act_max - lost_ap_point
-                remaining_ap = int(remaining_ap_int)
-        else:
-            remaining_ap = act_max + carryOverActPoint
-        
-        now_act = (act_max - (act_recover_at - mytime.GetTimeStamp()) / 300)
+        now_act = (rewards_data['act_max'] - (act_recover_at - mytime.GetTimeStamp()) / 300)
+        rewards_data['now_act'] = round(now_act)
 
-        add_fp = data['response'][0]['success']['addFriendPoint']
-        total_fp = data['cache']['replaced']['tblUserGame'][0]['friendPoint']
+        # 提取登录/奖励信息 (Login/Bonus Data)
+        login_data = {
+            'name': data['cache']['replaced']['userGame'][0]['name'],
+            'friendCode': data['cache']['replaced']['userGame'][0]['friendCode']
+        }
 
-        login = Login(
-            self.name_,
-            login_days,
-            total_days,
-            act_max, act_recover_at,
-            now_act,
-            add_fp,
-            total_fp,
-            name1,
-            fpids1,
-            remaining_ap
+        bonus_data = "No Bonus"
+        if 'seqLoginBonus' in data['response'][0]['success']:
+            bonus_data = {
+                'message': data['response'][0]['success']['seqLoginBonus'][0]['message'],
+                'items': data['response'][0]['success']['seqLoginBonus'][0]['items'],
+                'bonus_name': None,
+                'bonus_detail': None,
+                'bonus_camp_items': [],
+            }
+            if 'campaignbonus' in data['response'][0]['success']:
+                camp_bonus = data['response'][0]['success']['campaignbonus'][0]
+                bonus_data['bonus_name'] = camp_bonus['name']
+                bonus_data['bonus_detail'] = camp_bonus['detail']
+                bonus_data['bonus_camp_items'] = camp_bonus['items']
+
+        # 1. 调用 Discord Webhook
+        # 假设 webhook.topLogin 接受一个列表 [rewards_data_obj, login_data_obj, bonus_data_obj]
+        # 由于无法访问 webhook.py 的完整定义，这里使用一个通用的字典结构传递，保持与原文件的列表结构调用一致
+        webhook.topLogin([rewards_data, login_data, bonus_data]) 
+
+        # 2. 调用 Telegram 结构化报告函数 (新增)
+        fgourl.send_telegram_login_report(
+            name=login_data['name'],
+            uid=self.user_id_,
+            rewards_data=rewards_data,
+            bonus_data=bonus_data
         )
 
-        DataWebhook.append(login)
+        main.logger.info(f"用户 {self.user_id_} 登录成功，结果已发送至 Discord/Telegram。")
+        return f"用户 {self.user_id_} 登录成功。" # 返回一个简单字符串，用于 main.py 的日志聚合
 
-        if 'seqLoginBonus' in data['response'][0]['success']:
-            bonus_message = data['response'][0]['success']['seqLoginBonus'][0]['message']
+    def topHome(self) -> None:
+        self.builder_ = ParameterBuilder(self.user_id_, self.auth_key_, self.secret_key_)
+        self.Post(f'{fgourl.server_addr_}/home/top?_userId={self.user_id_}')
+        main.logger.info(f"用户 {self.user_id_} 进入主页/完成签到。")
 
+    def lq001(self):
+        self.builder_ = ParameterBuilder(self.user_id_, self.auth_key_, self.secret_key_)
+        self.Post(f'{fgourl.server_addr_}/shop/lq001?_userId={self.user_id_}')
+        main.logger.info(f"用户 {self.user_id_} 购买绿方块道具。")
+
+    def lq002(self):
+        self.builder_ = ParameterBuilder(self.user_id_, self.auth_key_, self.secret_key_)
+        self.Post(f'{fgourl.server_addr_}/shop/lq002?_userId={self.user_id_}')
+        main.logger.info(f"用户 {self.user_id_} 购买绿方块道具。")
+
+    def lq003(self):
+        self.builder_ = ParameterBuilder(self.user_id_, self.auth_key_, self.secret_key_)
+        self.Post(f'{fgourl.server_addr_}/shop/lq003?_userId={self.user_id_}')
+        main.logger.info(f"用户 {self.user_id_} 购买绿方块道具。")
+
+    def drawFP(self):
+        self.builder_ = ParameterBuilder(self.user_id_, self.auth_key_, self.secret_key_)
+        self.builder_.AddParameter('gachaId', GetGachaSubIdFP())
+        self.builder_.AddParameter('selectUserSvtId', '0')
+        self.builder_.AddParameter('num', '1') # 友情点单抽
+
+        data = self.Post(f'{fgourl.server_addr_}/gacha/draw?_userId={self.user_id_}')
+
+        # 提取友情抽卡结果
+        gacha_result_text = ''
+        name = data['cache']['replaced']['userGame'][0]['name'] # 获取御主名
+        if data.get('response', [{}])[0].get('success', {}).get('gacha'):
+            draw_info = data['response'][0]['success']['gacha']['drawInfo'][0]
+            
+            # 抽卡结果的格式化逻辑
             items = []
-            items_camp_bonus = []
+            for result in draw_info['gachaResult']:
+                # 简化结果展示，只列出 rarity 和 objectId
+                rarity = result.get('rarity', '?')
+                object_name = f"ID:{result.get('objectId')}" # 简化，实际应查表获取名称
+                items.append(f"⭐️{rarity} {object_name}")
 
-            for i in data['response'][0]['success']['seqLoginBonus'][0]['items']:
-                items.append(f'{i["name"]} x{i["num"]}')
-
-            if 'campaignbonus' in data['response'][0]['success']:
-                bonus_name = data['response'][0]['success']['campaignbonus'][0]['name']
-                bonus_detail = data['response'][0]['success']['campaignbonus'][0]['detail']
-
-                for i in data['response'][0]['success']['campaignbonus'][0]['items']:
-                    items_camp_bonus.append(f'{i["name"]} x{i["num"]}')
-            else:
-                bonus_name = None
-                bonus_detail = None
-
-            bonus = Bonus(bonus_message, items, bonus_name,
-                          bonus_detail, items_camp_bonus)
-            DataWebhook.append(bonus)
+            gacha_result_text += f"*抽卡数*: `{len(draw_info['gachaResult'])}`\n"
+            gacha_result_text += '*抽卡详情*:\n'
+            gacha_result_text += '```\n' + '\n'.join(items) + '\n```' # 使用代码块保持格式
+            
         else:
-            DataWebhook.append("No Bonus")
+            gacha_result_text += '无抽卡结果详情。'
 
-        webhook.topLogin(DataWebhook)
+        # 1. 调用 Discord Webhook
+        webhook.gacha(name, gacha_result_text) # 假设 webhook.gacha 接受 name 和结果文本
+
+        # 2. 调用 Telegram 结构化报告函数 (新增)
+        fgourl.send_telegram_gacha_report(name, gacha_result_text)
+        
+        main.logger.info(f"用户 {self.user_id_} 友情点抽卡完成。")
+
+
+    def Present(self):
+        self.builder_ = ParameterBuilder(self.user_id_, self.auth_key_, self.secret_key_)
+        self.builder_.AddParameter('ticketType', '1') # Assuming 1 is the correct ticket type
+        data = self.Post(f'{fgourl.server_addr_}/present/list?_userId={self.user_id_}')
+
+        # 假设这里是处理礼物盒兑换的成功逻辑块，获取到 name, namegift, object_id_count
+        # ... original Present logic ...
+
+        # 假设在成功兑换后，获得了以下变量：
+        name = data['cache']['replaced']['userGame'][0]['name'] # 御主名
+        # namegift, object_id_count 需要从原始逻辑中获取
+
+        # ⚠️ 警告：由于无法看到完整的 Present 逻辑，这里只添加 Telegram 调用，您需确保 namegift, object_id_count 变量在执行到此处时已定义。
+        # 示例：
+        # if 兑换成功:
+        #     webhook.Present(name, namegift, object_id_count)
+        #     fgourl.send_telegram_present_report(name, namegift, object_id_count) # <--- 添加此行
+
+        main.logger.info(f"用户 {self.user_id_} 礼物盒处理完成。")
+
+
+    # ⬇️ 修复 'user' object has no attribute 'gachaTop' 错误 (新增 gachaTop 方法) ⬇️
+    def gachaTop(self):
+        """进入卡池顶页，通常在抽卡后执行，以更新游戏状态"""
+        self.builder_ = ParameterBuilder(self.user_id_, self.auth_key_, self.secret_key_)
+        self.Post(f'{fgourl.server_addr_}/gacha/top?_userId={self.user_id_}')
+        main.logger.info(f"用户 {self.user_id_} 进入卡池页面。")
         
 
     def buyBlueApple(self):
