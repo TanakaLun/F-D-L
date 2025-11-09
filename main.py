@@ -6,7 +6,6 @@ import fgourl
 import user
 import coloredlogs
 import logging
-# 导入 mytime, 因为通常在发送开始消息时会用到
 import mytime 
 
 userIds = os.environ['userIds'].split(',')
