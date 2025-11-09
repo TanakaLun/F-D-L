@@ -6,6 +6,8 @@ import fgourl
 import user
 import coloredlogs
 import logging
+# 导入 mytime, 因为通常在发送开始消息时会用到
+import mytime 
 
 userIds = os.environ['userIds'].split(',')
 authKeys = os.environ['authKeys'].split(',')
@@ -22,6 +24,10 @@ secretKeyNums = len(secretKeys)
 
 logger = logging.getLogger("FGO Daily Login")
 coloredlogs.install(fmt='%(asctime)s %(name)s %(levelname)s %(message)s')
+fgourl.TelegramBotToken = os.environ.get('TG_BOT_TOKEN')
+fgourl.TelegramChatId = os.environ.get('TG_CHAT_ID')
+fgourl.TelegramTopicId = os.environ.get('TG_TOPIC_ID')
+
 
 def get_latest_verCode():
     endpoint = "https://raw.githubusercontent.com/DNNDHH/FGO-VerCode-extractor/JP/VerCode.json"
@@ -39,6 +45,8 @@ def get_latest_appver():
 
 
 def main():
+    fgourl.SendTelegramMessage(f'🤖 *FGO 自动登录开始* (UTC+8: {mytime.GetFormattedNowTime()})')
+
     if userNums == authKeyNums and userNums == secretKeyNums:
         fgourl.set_latest_assets()
         for i in range(userNums):
@@ -62,13 +70,16 @@ def main():
                 time.sleep(1)
                 instance.drawFP()
                 time.sleep(1)
-                instance.LTO_Gacha()
-                
+                instance.gachaTop()
 
+            except Exception as e:
+                logger.error(f"处理用户 {userIds[i]} 失败: {e}")
+                fgourl.SendTelegramMessage(f'❌ *账号处理失败*\n用户ID: `{userIds[i]}`\n错误: {e}')
 
-            except Exception as ex:
-                logger.error(ex)
+        fgourl.SendTelegramMessage(f'✅ *FGO 自动登录结束* (处理 {userNums} 个账号)')
+    else:
+        logger.error(f"配置错误: 用户ID/AuthKey/SecretKey数量不匹配。")
+        fgourl.SendTelegramMessage(f'🚨 *配置错误*\n请检查 GitHub Secrets 中 `userIds`, `authKeys`, `secretKeys` 的数量是否一致。')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
-

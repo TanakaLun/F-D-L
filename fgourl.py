@@ -1,4 +1,4 @@
-import json
+imimport json
 import binascii
 import requests
 import main
@@ -19,6 +19,10 @@ data_server_folder_crc_ = 0
 server_addr_ = 'https://game.fate-go.jp'
 github_token_ = ''
 github_name_ = ''
+
+TelegramBotToken = ''
+TelegramChatId = ''
+TelegramTopicId = None
 
 
 # ==== User Info ====
@@ -68,13 +72,43 @@ httpheader = {
     'User-Agent': user_agent_2,
     'Accept-Encoding': "deflate, gzip",
     'Content-Type': "application/x-www-form-urlencoded",
-    'X-Unity-Version': "2022.3.62f2"
+    'X-Unity-Version': "2022.3.28f1"
 
 }
 
 
 def NewSession():
     return requests.Session()
+
+def SendTelegramMessage(message: str) -> None:
+    """发送消息到配置的 Telegram 群组，支持指定话题/线程。"""
+    if not TelegramBotToken or not TelegramChatId:
+        print("Telegram Bot Token 或 Chat ID 未配置，跳过通知。")
+        main.logger.warning("Telegram Bot Token 或 Chat ID 未配置，跳过通知。")
+        return
+
+    url = f'https://api.telegram.org/bot{TelegramBotToken}/sendMessage'
+    payload = {
+        'chat_id': TelegramChatId,
+        'text': message,
+        'parse_mode': 'Markdown'
+    }
+    
+    if TelegramTopicId and TelegramTopicId.strip() != '' and TelegramTopicId.strip() != '0':
+        try:
+            # message_thread_id 必须是整数
+            thread_id = int(TelegramTopicId.strip())
+            payload['message_thread_id'] = thread_id
+            main.logger.info(f"发送到群组 {TelegramChatId} 的话题 {thread_id}")
+        except ValueError:
+            main.logger.error(f"Telegram Topic ID 无效: {TelegramTopicId}。作为普通消息发送。")
+    else:
+        main.logger.info(f"发送到群组 {TelegramChatId} (无话题指定)")
+
+    try:
+        requests.post(url, data=payload, timeout=15)
+    except Exception as e:
+        main.logger.error(f"发送 Telegram 消息失败: {e}")
 
 
 def PostReq(s, url, data):
