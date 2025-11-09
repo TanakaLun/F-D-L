@@ -28,9 +28,9 @@ secretKeyNums = len(secretKeys)
 logger = logging.getLogger("FGO Daily Login")
 coloredlogs.install(fmt='%(asctime)s %(name)s %(levelname)s %(message)s')
 
-fgourl.TelegramBotToken = os.environ.get('TGBotToken')
-fgourl.TelegramAdminId = os.environ.get('TGAdminId')
-fgourl.TelegramTopicId = os.environ.get('TGTopicId')
+fgourl.TelegramBotToken = os.environ.get('TG_BOT_TOKEN')
+fgourl.TelegramAdminId = os.environ.get('TG_CHAT_ID')
+fgourl.TelegramTopicId = os.environ.get('TG_TOPIC_ID')
 fgourl.github_token_ = os.environ.get('GithubToken')
 fgourl.github_name_ = os.environ.get('GithubName')
 
