@@ -8,8 +8,6 @@ import coloredlogs
 import logging
 import sys
 
-os.environ['fate_region'] = fate_region
-
 # Telegram configuration (read once for webhook_telegram)
 os.environ['TELEGRAM_BOT_TOKEN'] = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 os.environ['TELEGRAM_CHAT_ID'] = os.environ.get('TELEGRAM_CHAT_ID', '')
@@ -23,6 +21,7 @@ device_info = os.environ.get('DEVICE_INFO_SECRET')
 appCheck = os.environ.get('APP_CHECK_SECRET')
 user_agent_2 = os.environ.get('USER_AGENT_SECRET_2')
 fate_region = os.environ.get('FATE_REGION', 'JP')
+os.environ['fate_region'] = fate_region
 
 userNums = len(userIds)
 authKeyNums = len(authKeys)
@@ -73,16 +72,9 @@ def main():
 
                 instance.drawFP()
                 time.sleep(1)
-                #instance.LTO_Gacha()
-                #instance.LTO_drawFP()
-
-            
-                
-
 
             except Exception as ex:
                 logger.error(ex)
 
 if __name__ == "__main__":
     main()
-
