@@ -37,5 +37,8 @@ jobs:
           DEVICE_INFO_SECRET: ${{ secrets.DEVICE_INFO_SECRET }}
           APP_CHECK_SECRET: ${{ secrets.APP_CHECK_SECRET }}
           USER_AGENT_SECRET_2: ${{ secrets.USER_AGENT_SECRET_2 }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_TOPIC_ID: ${{ secrets.TELEGRAM_TOPIC_ID }}
 
 

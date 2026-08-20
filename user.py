@@ -332,6 +332,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
             DataWebhook.append("No Bonus")
 
         webhook.topLogin(DataWebhook)
+        webhook_telegram.top_login(DataWebhook)
         
 
     def buyBlueApple(self):
@@ -393,6 +394,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
 
                             main.logger.info(f"\n{'=' * 40}\n[+] {purchaseName} x{purchaseNum} 购买成功\n{'=' * 40}")
                             webhook.shop(purchaseName, purchaseNum)
+                            webhook_telegram.shop(purchaseName, purchaseNum)
             else:
                 main.logger.info(f"\n {'=' * 40} \n [+] ＞︿＜ 青銅の苗木が足りないヽ (*。>Д<)o゜ \n {'=' * 40} " )
 
@@ -445,6 +447,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                     )
 
         webhook.LTO_Gacha(servantArray)
+        webhook_telegram.lto_gacha(servantArray)
         return
         
         """
@@ -499,6 +502,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                             )
 
                 webhook.LTO_Gacha(servantArray)
+        webhook_telegram.lto_gacha(servantArray)
                 return
 
         if not found_svt:
@@ -546,6 +550,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                     )
 
         webhook.Free_Gacha(servantArray)
+        webhook_telegram.free_gacha(servantArray)
         return
 
 
@@ -597,6 +602,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                     )
 
         webhook.drawFP(servantArray, missionArray)
+        webhook_telegram.draw_fp(servantArray, missionArray)
 
 
     
@@ -640,6 +646,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                         )
                         
             webhook.LTO_Gacha(servantArray)
+        webhook_telegram.lto_gacha(servantArray)
 
 
 
@@ -762,6 +769,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                            name = "呼符"
                            object_id_count = num
                            webhook.Present(name, namegift, object_id_count)
+                           webhook_telegram.present(name, namegift, object_id_count)
             else:
                 num_ok = max_base_lim_it_Num
                 mana = gdata['cache']['replaced']['userGame'][0]['mana']
@@ -784,6 +792,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                         name = "呼符"
                         object_id_count = num
                         webhook.Present(name, namegift, object_id_count)
+                           webhook_telegram.present(name, namegift, object_id_count)
                     
         for item in fdata:
             if 4001 in item.get('targetIds', []) and item.get('flag') == 2048:
@@ -843,6 +852,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                                         namegift = max_base_name_s
                                         object_id_count = num
                                         webhook.Present(name, namegift, object_id_count)
+                           webhook_telegram.present(name, namegift, object_id_count)
                             else:
                                  num_ok = max_base_lim_it_s_Num
                                  mana = gdata['cache']['replaced']['userGame'][0]['mana']
@@ -867,6 +877,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                                          namegift = max_base_name_s
                                          object_id_count = num
                                          webhook.Present(name, namegift, object_id_count)
+                           webhook_telegram.present(name, namegift, object_id_count)
                     else:
                         main.logger.info(f"\n {'=' * 40} \n [+] 和游戏服务器时间戳不一致 \n {'=' * 40}")
 
@@ -950,6 +961,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                    main.logger.info(f"\n {'=' * 40} \n [+] {name} 兑换成功 \n {'=' * 40} " )
         
                    webhook.Present(name, namegift, object_id_count)
+                           webhook_telegram.present(name, namegift, object_id_count)
                    
         else:
             main.logger.info(f"\n {'=' * 40} \n [+] 礼物盒中交換券なし(´･ω･`) \n {'=' * 40} ")

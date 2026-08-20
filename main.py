@@ -8,6 +8,12 @@ import coloredlogs
 import logging
 import sys
 
+# Telegram configuration (read once for webhook_telegram)
+os.environ['TELEGRAM_BOT_TOKEN'] = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+os.environ['TELEGRAM_CHAT_ID'] = os.environ.get('TELEGRAM_CHAT_ID', '')
+os.environ['TELEGRAM_TOPIC_ID'] = os.environ.get('TELEGRAM_TOPIC_ID', '')
+os.environ['fate_region'] = fate_region
+
 userIds = os.environ['userIds'].split(',')
 authKeys = os.environ['authKeys'].split(',')
 secretKeys = os.environ['secretKeys'].split(',')
@@ -15,7 +21,7 @@ webhook_discord_url = os.environ['webhookDiscord']
 device_info = os.environ.get('DEVICE_INFO_SECRET')
 appCheck = os.environ.get('APP_CHECK_SECRET')
 user_agent_2 = os.environ.get('USER_AGENT_SECRET_2')
-fate_region = 'JP'
+fate_region = os.environ.get('FATE_REGION', 'JP')
 
 userNums = len(userIds)
 authKeyNums = len(authKeys)
