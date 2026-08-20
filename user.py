@@ -769,7 +769,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                            name = "呼符"
                            object_id_count = num
                            webhook.Present(name, namegift, object_id_count)
-                           webhook_telegram.present(name, namegift, object_id_count)
+                        webhook_telegram.present(name, namegift, object_id_count)
             else:
                 num_ok = max_base_lim_it_Num
                 mana = gdata['cache']['replaced']['userGame'][0]['mana']
@@ -792,7 +792,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                         name = "呼符"
                         object_id_count = num
                         webhook.Present(name, namegift, object_id_count)
-                           webhook_telegram.present(name, namegift, object_id_count)
+                        webhook_telegram.present(name, namegift, object_id_count)
                     
         for item in fdata:
             if 4001 in item.get('targetIds', []) and item.get('flag') == 2048:
@@ -852,7 +852,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                                         namegift = max_base_name_s
                                         object_id_count = num
                                         webhook.Present(name, namegift, object_id_count)
-                           webhook_telegram.present(name, namegift, object_id_count)
+                                        webhook_telegram.present(name, namegift, object_id_count)
                             else:
                                  num_ok = max_base_lim_it_s_Num
                                  mana = gdata['cache']['replaced']['userGame'][0]['mana']
@@ -877,7 +877,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                                          namegift = max_base_name_s
                                          object_id_count = num
                                          webhook.Present(name, namegift, object_id_count)
-                           webhook_telegram.present(name, namegift, object_id_count)
+                        webhook_telegram.present(name, namegift, object_id_count)
                     else:
                         main.logger.info(f"\n {'=' * 40} \n [+] 和游戏服务器时间戳不一致 \n {'=' * 40}")
 
@@ -961,7 +961,7 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                    main.logger.info(f"\n {'=' * 40} \n [+] {name} 兑换成功 \n {'=' * 40} " )
         
                    webhook.Present(name, namegift, object_id_count)
-                           webhook_telegram.present(name, namegift, object_id_count)
+                   webhook_telegram.present(name, namegift, object_id_count)
                    
         else:
             main.logger.info(f"\n {'=' * 40} \n [+] 礼物盒中交換券なし(´･ω･`) \n {'=' * 40} ")
