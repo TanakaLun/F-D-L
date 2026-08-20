@@ -7,6 +7,7 @@ import fgourl
 import mytime
 import gacha
 import webhook
+import webhook_telegram
 import main
 import logging
 import json
@@ -403,8 +404,6 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
 
 
     def LTO_Gacha(self):
-        # 5/15 【期間限定】「アルトリア･ペンドラゴン〔リリィ〕フレンドポイント召喚」！
-
         nowAt = mytime.GetTimeStamp()
         closedAt = 1748404799
         
@@ -449,72 +448,10 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
         webhook.LTO_Gacha(servantArray)
         webhook_telegram.lto_gacha(servantArray)
         return
-        
-        """
-        if nowAt > closedAt:
-            main.logger.info(f"\n {'=' * 40} \n [+] 期間限定召喚 已结束 \n {'=' * 40} ")
-            return
-
-        with open('login.json', 'r', encoding='utf-8') as file:
-            data = json.load(file)
-
-        user_svt_list = data.get('cache', {}).get('replaced', {}).get('userSvt', [])
-
-        found_svt = False 
-
-        for svt in user_svt_list:
-            svtId = svt.get('svtId')
-            if svtId in [2300800, 2300700]:  #岸波白野的SvtID
-                found_svt = True 
-                
-                gachaId = 3  #这个限定卡池有两个ID【 2 / 3 】懒得写判定，如果报错就用2
-                gachaSubId = 417  #这个限定卡池有两个ID【 416 / 417 】懒得写判定，如果报错就用416
-
-                self.builder_.AddParameter('storyAdjustIds', '[]')
-                self.builder_.AddParameter('selectBonusList', '')
-                self.builder_.AddParameter('gachaId', str(gachaId))
-                self.builder_.AddParameter('num', '10')
-                self.builder_.AddParameter('ticketItemId', '0')
-                self.builder_.AddParameter('shopIdIndex', '1')
-                self.builder_.AddParameter('gachaSubId', str(gachaSubId))
-                
-                main.logger.info(f"\n {'=' * 40} \n [+] 期間限定召喚 GachaId：{gachaId} SubId：{gachaSubId} \n {'=' * 40} ")
-                data = self.Post(f'{fgourl.server_addr_}/gacha/draw?_userId={self.user_id_}')
-                
-                responses = data['response']
-
-                servantArray = []
-                missionArray = []
-
-                for response in responses:
-                    resCode = response['resCode']
-                    resSuccess = response['success']
-
-                    if (resCode != "00"):
-                        continue
-
-                    if "gachaInfos" in resSuccess:
-                        for info in resSuccess['gachaInfos']:
-                            servantArray.append(
-                                gacha.gachaInfoServant(
-                                    info['objectId']
-                                )
-                            )
-
-                webhook.LTO_Gacha(servantArray)
-        webhook_telegram.lto_gacha(servantArray)
-                return
-
-        if not found_svt:
-            main.logger.info(f"\n {'=' * 40} \n [+] 不满足活动条件..不能参加限定召唤 \n {'=' * 40} ")
-            return 
-            """
 
 
 
     def Free_Gacha(self):
-        # 
-
         gachaId = 21001
         gachaSubId = 0
 
@@ -556,7 +493,6 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
 
 
     def drawFP(self):
-        #SubID判定有点不准了.偶尔错误抽卡失败...等哪天闲暇再修
         gachaSubId = GetGachaSubIdFP()
         main.logger.info(f"\n {'=' * 40} \n [+] 友情卡池ID : {gachaSubId}\n {'=' * 40} " )
         
@@ -570,7 +506,6 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
         self.builder_.AddParameter('ticketItemId', '0')
         self.builder_.AddParameter('shopIdIndex', '1')
         self.builder_.AddParameter('gachaSubId', gachaSubId)
-        #self.builder_.AddParameter('gachaSubId', '485')
 
         data = self.Post(f'{fgourl.server_addr_}/gacha/draw?_userId={self.user_id_}')
         responses = data['response']
@@ -607,8 +542,6 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
 
     
     def LTO_drawFP(self):
-        #『「春の新米マスター応援キャンペーン2026！」ピックアップ召喚』期間 2026年3月30日(月) 18:00～4月13日(月) 12:59まで
-        
         def setup_parameters(gachaId, gachaSubId):
             self.builder_.AddParameter('storyAdjustIds', '[]')
             self.builder_.AddParameter('selectBonusList', '')
@@ -662,8 +595,6 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
 
     
     def lq001(self):
-         # https://game.fate-go.jp/present/list?
-          
         data = self.Post(
             f'{fgourl.server_addr_}/present/list?_userId={self.user_id_}')
         
@@ -675,13 +606,12 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
         main.logger.info(f"\n {'=' * 40} \n [+] 获得礼物盒数据 \n {'=' * 40} " )
 
     def lq002(self):
-         # https://game.fate-go.jp/present/receive?
         with open('login.json', 'r', encoding='utf-8')as f:
             data = json.load(f)
 
         present_ids = []
         for item in data['cache']['replaced']['userPresentBox']:
-            if item['objectId'] in [2, 6, 11, 16, 3, 46, 18, 48, 4001, 100, 101, 102, 103, 104, 1, 4, 7998, 7999, 1000, 2000, 6999, 9570400, 9670400, 9670500, 9570500]: #添加你需要领取的物品 Id 或者 baseSvtId 进入筛选列表
+            if item['objectId'] in [2, 6, 11, 16, 3, 46, 18, 48, 4001, 100, 101, 102, 103, 104, 1, 4, 7998, 7999, 1000, 2000, 6999, 9570400, 9670400, 9670500, 9570500]:
                 present_ids.append(str(item['presentId']))
 
         with open('JJM.json', 'w') as f:
@@ -709,8 +639,6 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
             main.logger.info(f"\n {'=' * 40} \n [+] 领取成功 \n {'=' * 40} " )
 
     def lq003(self):
-        # https://game.fate-go.jp/shop/purchase
-        
         url = 'https://raw.githubusercontent.com/DNNDHH/GSubList/Main/Shopdate.json'
         response = requests.get(url)
         fdata = response.json()
@@ -883,7 +811,6 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
 
     
     def Present(self):
-        #素材交換券
         response = requests.get("https://api.atlasacademy.io/export/JP/nice_item.json")
         if response.status_code == 200:
             with open("nice_item.json", 'wb') as f:
@@ -965,18 +892,3 @@ xCGlz9vV3+AAQ31C2phoyd/QhvpL85p39n6Ibg==
                    
         else:
             main.logger.info(f"\n {'=' * 40} \n [+] 礼物盒中交換券なし(´･ω･`) \n {'=' * 40} ")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
