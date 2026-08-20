@@ -8,11 +8,12 @@ import coloredlogs
 import logging
 import sys
 
+os.environ['fate_region'] = fate_region
+
 # Telegram configuration (read once for webhook_telegram)
 os.environ['TELEGRAM_BOT_TOKEN'] = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 os.environ['TELEGRAM_CHAT_ID'] = os.environ.get('TELEGRAM_CHAT_ID', '')
 os.environ['TELEGRAM_TOPIC_ID'] = os.environ.get('TELEGRAM_TOPIC_ID', '')
-os.environ['fate_region'] = fate_region
 
 userIds = os.environ['userIds'].split(',')
 authKeys = os.environ['authKeys'].split(',')
